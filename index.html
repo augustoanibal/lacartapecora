@@ -554,17 +554,28 @@
         const genero = libro.genero || libro.genre || '';
         const resena = libro.resena || libro.description || libro.sinopsis || 'Sin reseña disponible.';
         
-        let rawPortada = (libro.url_portada || libro.cover_url || libro.imagen || libro.portada || '').trim();
+     let rawPortada = (libro.url_portada || libro.cover_url || libro.imagen || libro.portada || '').trim();
 let url_portada = '';
 
-if (rawPortada.startsWith('http://') || rawPortada.startsWith('https://')) {
-  // Si en la base de datos ya guardaste la URL completa
+// Si la URL guardada en la base de datos es la del panel de administración (dashboard)
+if (rawPortada.includes('supabase.com/dashboard/project/')) {
+  // Extrae el parámetro preview (ejemplo: "3_los_extramuros.webp")
+  const match = rawPortada.match(/preview=([^&]+)/);
+  if (match && match[1]) {
+    url_portada = `${SUPABASE_URL}/storage/v1/object/public/PORTADAS/${match[1]}`;
+  }
+} 
+// Si ya es una URL pública que empieza por http/https
+else if (rawPortada.startsWith('http://') || rawPortada.startsWith('https://')) {
   url_portada = rawPortada;
-} else if (rawPortada !== '') {
-  // Si en la base de datos solo está el nombre (ej. 1_primavera_extramuros.webp)
+} 
+// Si solo está guardado el nombre del archivo (ejemplo: "3_los_extramuros.webp")
+else if (rawPortada !== '') {
   url_portada = `${SUPABASE_URL}/storage/v1/object/public/PORTADAS/${rawPortada.replace(/^\//, '')}`;
-} else {
-  // Si está vacío
+}
+
+// Si estuvo vacío o falló la extracción, asigna una imagen por defecto funcional
+if (!url_portada) {
   url_portada = 'https://via.placeholder.com/220x330?text=Sin+Portada';
 }
 
