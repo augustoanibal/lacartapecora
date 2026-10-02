@@ -186,53 +186,22 @@
       line-height: 1.7;
     }
 
-    /* SECCIONES SECUNDARIAS */
-    /* CUADRÍCULA DE 4 COLUMNAS PARALELAS */
-.sections-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-bottom: 70px;
-  align-items: start;
-}
+    /* SECCIONES ORGANIZADAS EN BLOQUES VERTICALES */
+    .sections-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      margin-bottom: 70px;
+    }
 
-.section-col {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.section-col .section-title {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-dark);
-  font-weight: 800;
-  margin-bottom: 0;
-}
-
-.section-col .info-box {
-  background: var(--bg);
-  box-shadow: var(--nm-flat);
-  padding: 24px 20px;
-  border-radius: var(--radius-large);
-  color: var(--text-dark);
-  font-size: 0.88rem;
-  height: 100%;
-}
-
-/* RESPONSIVE: En pantallas medianas cambia a 2 columnas y en celulares a 1 */
-@media (max-width: 1024px) {
-  .sections-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .sections-grid {
-    grid-template-columns: 1fr;
-  }
-}
+    .section-title {
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dark);
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
 
     /* TARJETAS DE LIBROS */
     .grid-books {
@@ -364,24 +333,6 @@
       color: var(--text-dark);
     }
 
-    /* ESTADO DE CARGA (SKELETON) */
-    .skeleton-card {
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
-      border-radius: var(--radius-large);
-      padding: 36px;
-      display: grid;
-      grid-template-columns: 210px 1fr;
-      gap: 40px;
-      opacity: 0.7;
-    }
-
-    .skeleton-box {
-      background: var(--bg);
-      box-shadow: var(--nm-pressed);
-      border-radius: 12px;
-    }
-
     footer {
       padding: 50px 0;
       text-align: center;
@@ -397,7 +348,7 @@
         gap: 30px;
       }
 
-      .book-card, .skeleton-card {
+      .book-card {
         grid-template-columns: 1fr;
         padding: 24px;
         gap: 24px;
@@ -437,54 +388,56 @@
 
     <section class="about-section">
       <article class="about-card">
-        <h1>Visión</h1>
+        <h2>Visión</h2>
         <p>
           Nuestra visión es consolidarnos como el espacio digital de referencia regional para la preservación y lectura de autores locales. Aspiramos a ser el repositorio cultural más innovador, promoviendo el conocimiento y la creación sin fronteras físicas. Nos proyectamos como una plataforma dinámica e incluyente que no solo rescata la memoria colectiva e impulsa la circulación de obras en PDF, sino que demuestra que, desde un entorno virtual, es factible mejorar nuestras destrezas de escritura de manera ágil e interactiva, transformando la forma en que el mundo descubre y valora el talento de nuestra tierra.
         </p>
       </article>
 
       <article class="about-card">
-        <h1>Misión</h1>
+        <h2>Misión</h2>
         <p>
           Nuestra misión es preservar, rescatar y difundir la riqueza literaria e intelectual de los autores de nuestra región a través de un archivo digital accesible en formato PDF. Nos dedicamos a democratizar la lectura y ser un canal abierto donde, por medio de talleres virtuales, es factible potenciar nuestras capacidades de expresión y escritura. Buscamos salvaguardar el patrimonio escrito, promover la identidad cultural de nuestra comunidad y conectar activamente la voz de los creadores con lectores de todas las generaciones.
         </p>
       </article>
     </section>
 
-    <!-- CONTENEDOR DE 4 COLUMNAS PARALELAS -->
-<section class="sections-grid">
-  <!-- Columna 1: Obras -->
-  <div id="catalogo" class="section-col">
-    <h2 class="section-title">Obras Disponibles</h2>
-    <div id="catalog" class="grid-books">
-      <!-- Carga dinámica o mensaje -->
-    </div>
-  </div>
+    <!-- SECCIONES EN BLOQUES VERTICALES PARA PERMITIR EL SCROLL DE LA NAVEGACIÓN -->
+    <div class="sections-vertical">
+      
+      <!-- Sección 1: Obras -->
+      <section id="catalogo">
+        <h2 class="section-title">Obras Disponibles</h2>
+        <div id="catalog" class="grid-books">
+          <!-- Carga dinámica desde Supabase -->
+        </div>
+      </section>
 
-  <!-- Columna 2: Autores -->
-  <div id="autores" class="section-col">
-    <h2 class="section-title">Autores Destacados</h2>
-    <div class="info-box">
-      <p>Espacio dedicado al catálogo biográfico y la nómina de creadores locales representados en nuestro archivo.</p>
-    </div>
-  </div>
+      <!-- Sección 2: Autores -->
+      <section id="autores">
+        <h2 class="section-title">Autores Destacados</h2>
+        <div class="info-box">
+          <p>Espacio dedicado al catálogo biográfico y la nómina de creadores locales representados en nuestro archivo.</p>
+        </div>
+      </section>
 
-  <!-- Columna 3: Talleres -->
-  <div id="talleres" class="section-col">
-    <h2 class="section-title">Talleres Virtuales</h2>
-    <div class="info-box">
-      <p>Espacio interactivo enfocado en potenciar las capacidades de expresión, lectura crítica y creación literaria de la comunidad.</p>
-    </div>
-  </div>
+      <!-- Sección 3: Talleres -->
+      <section id="talleres">
+        <h2 class="section-title">Talleres Virtuales</h2>
+        <div class="info-box">
+          <p>Espacio interactivo enfocado en potenciar las capacidades de expresión, lectura crítica y creación literaria de la comunidad.</p>
+        </div>
+      </section>
 
-  <!-- Columna 4: Contacto -->
-  <div id="contacto" class="section-col">
-    <h2 class="section-title">Contacto</h2>
-    <div class="info-box">
-      <p>¿Eres un autor local o deseas enviar una obra para su archivo y difusión? Escríbenos para ponernos en comunicación.</p>
+      <!-- Sección 4: Contacto -->
+      <section id="contacto">
+        <h2 class="section-title">Contacto</h2>
+        <div class="info-box">
+          <p>¿Eres un autor local o deseas enviar una obra para su archivo y difusión? Escríbenos para ponernos en comunicación.</p>
+        </div>
+      </section>
+
     </div>
-  </div>
-</section>
 
     <footer>
       <p>© <span id="year"></span> CARTAPECORA. Todos los derechos reservados.</p>
@@ -498,7 +451,7 @@
     const SUPABASE_URL = 'https://xuiomosfnutsxrqjvszy.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_GOx8Ejp0p50ZZJGL0CqO9w_nllW8cbk';
     
-    // Inicialización resiliente
+    // Inicialización
     let supabaseClient = null;
     if (typeof supabase !== 'undefined') {
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
