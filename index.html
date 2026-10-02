@@ -554,10 +554,19 @@
         const genero = libro.genero || libro.genre || '';
         const resena = libro.resena || libro.description || libro.sinopsis || 'Sin reseña disponible.';
         
-        let url_portada = (libro.url_portada || libro.cover_url || libro.imagen || '').trim();
-        if (!url_portada) {
-          url_portada = 'https://via.placeholder.com/220x330?text=Sin+Portada';
-        }
+        let rawPortada = (libro.url_portada || libro.cover_url || libro.imagen || libro.portada || '').trim();
+let url_portada = '';
+
+if (rawPortada.startsWith('http://') || rawPortada.startsWith('https://')) {
+  // Si en la base de datos ya guardaste la URL completa
+  url_portada = rawPortada;
+} else if (rawPortada !== '') {
+  // Si en la base de datos solo está el nombre (ej. 1_primavera_extramuros.webp)
+  url_portada = `${SUPABASE_URL}/storage/v1/object/public/PORTADAS/${rawPortada.replace(/^\//, '')}`;
+} else {
+  // Si está vacío
+  url_portada = 'https://via.placeholder.com/220x330?text=Sin+Portada';
+}
 
         const url_pdf = (libro.url_pdf || libro.pdf_url || libro.archivo || '#').trim();
 
