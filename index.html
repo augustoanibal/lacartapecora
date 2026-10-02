@@ -5,29 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CARTAPECORA — Archivo Literario Virtual</title>
   
-  <!-- Tipografía secundaria elegante de respaldo si NT Wagner no está local -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 
-  <!-- SDK de Supabase desde CDN -->
+  <!-- GSAP Library para el Slider -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      /* Base cromática */
-      --bg: #D6CFE1;
-      --text-dark: #222222;
-      --text-muted: #4D4657; /* Optimizado para accesibilidad WCAG */
-      --brand-accent: #9F430A;
+      --bg: #12131C;
+      --text-dark: #eceff1;
+      --text-muted: #94a3b8;
+      --brand-accent: #ffb703;
       
-      /* Sombras Neumórficas (Soft UI) adaptadas al fondo #D6CFE1 */
-      --nm-flat: 12px 12px 24px #b6afbf, -12px -12px 24px #f6efff;
-      --nm-flat-hover: 16px 16px 32px #b6afbf, -16px -16px 32px #f6efff;
-      --nm-pressed: inset 5px 5px 10px #b6afbf, inset -5px -5px 10px #f6efff;
-      --nm-pill: 8px 8px 16px #b6afbf, -8px -8px 16px #f6efff;
-      --nm-pill-hover: 4px 4px 10px #b6afbf, -4px -4px 10px #f6efff;
-
       --radius-large: 28px;
       --radius-medium: 18px;
       --radius-pill: 50px;
@@ -49,6 +42,7 @@
       color: var(--text-dark);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     .container {
@@ -74,18 +68,12 @@
       width: 110px;
       height: 110px;
       border-radius: 50%;
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .logo-container:hover {
-      transform: scale(1.03);
-      box-shadow: var(--nm-flat-hover);
     }
 
     .logo-container img {
@@ -95,12 +83,12 @@
     }
 
     .brand-title {
-      font-family: 'NT Wagner', 'Cormorant Garamond', Georgia, serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 2.4rem;
       letter-spacing: 0.18em;
-      text-transform: capitalize;
+      text-transform: uppercase;
       font-weight: 800;
-      color: var(--brand-accent);
+      color: #eceff1;
     }
 
     .brand-subtitle {
@@ -111,226 +99,136 @@
       font-weight: 600;
     }
 
-    /* BARRA DE NAVEGACIÓN NEUMÓRFICA */
-    .main-nav {
-      margin-top: 16px;
+    /* ESTILOS BASADOS EN LA REFERENCIA CODETHMUHILAN */
+    .main {
+      max-width: 75rem;
+      margin: 0 auto;
+      padding: 3em 1.5em;
     }
 
-    .nav-list {
+    .main__heading {
+      font-weight: 600;
+      font-size: 2.25em;
+      margin-bottom: 0.75em;
+      text-align: center;
+      color: #eceff1;
+    }
+
+    .cards {
+      position: relative;
+    }
+
+    .cards__inner {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      list-style: none;
       flex-wrap: wrap;
+      gap: 2.5em;
+      justify-content: center;
     }
 
-    .nav-link {
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-dark);
-      padding: 12px 28px;
-      border-radius: var(--radius-pill);
-      background: var(--bg);
-      box-shadow: var(--nm-pill);
-      transition: all 0.2s ease;
-    }
-
-    .nav-link:hover {
-      box-shadow: var(--nm-pill-hover);
-      color: var(--brand-accent);
-      transform: translateY(1px);
-    }
-
-    .nav-link:active {
-      box-shadow: var(--nm-pressed);
-    }
-
-    /* VISIÓN Y MISIÓN */
-    .about-section {
-      margin: 50px 0 70px;
+    .card {
+      --flow-space: 0.5em;
+      --hsl: var(--hue), var(--saturation), var(--lightness);
+      flex: 1 1 18rem;
+      max-width: 24rem;
+      padding: 1.5em 2em;
+      gap: 1.25em;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      grid-template-rows: auto auto auto 1fr;
+      align-items: start;
+      color: #eceff1;
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, border-color 0.3s ease;
     }
 
-    .about-card {
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
-      padding: 40px;
-      border-radius: var(--radius-large);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: hsl(var(--hsl));
     }
 
-    .about-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--nm-flat-hover);
+    /* Colores por tarjeta basados en la imagen */
+    .card:nth-child(1) {
+      --hue: 165;
+      --saturation: 82.26%;
+      --lightness: 51.37%;
     }
 
-    .about-card h2 {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--brand-accent);
-      margin-bottom: 14px;
+    .card:nth-child(2) {
+      --hue: 291.34;
+      --saturation: 95.9%;
+      --lightness: 61.76%;
+    }
+
+    .card:nth-child(3) {
+      --hue: 210;
+      --saturation: 90%;
+      --lightness: 60%;
+    }
+
+    .card:nth-child(4) {
+      --hue: 35;
+      --saturation: 95%;
+      --lightness: 55%;
+    }
+
+    .card__title {
+      font-size: 1.25rem;
       font-weight: 700;
+      color: hsl(var(--hsl));
     }
 
-    .about-card p {
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      text-align: justify;
-      line-height: 1.7;
-    }
-
-    /* SECCIONES ORGANIZADAS EN BLOQUES VERTICALES */
-    .sections-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 60px;
-      margin-bottom: 70px;
-    }
-
-    .section-title {
-      font-size: 1.2rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-dark);
-      font-weight: 800;
-      margin-bottom: 20px;
+    .card__description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
     /* TARJETAS DE LIBROS */
     .grid-books {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
     }
 
     .book-card {
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
-      border-radius: var(--radius-large);
-      padding: 36px;
-      display: grid;
-      grid-template-columns: 210px 1fr;
-      gap: 40px;
-      align-items: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .book-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--nm-flat-hover);
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .cover-wrapper {
       width: 100%;
       aspect-ratio: 2 / 3;
-      border-radius: var(--radius-medium);
-      background: var(--bg);
-      box-shadow: var(--nm-pressed);
+      border-radius: 8px;
       overflow: hidden;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .cover-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 12px;
     }
 
-    .book-info {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .book-title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text-dark);
-    }
-
-    .book-author {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .book-tags {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      background: var(--bg);
-      box-shadow: var(--nm-pressed);
-      color: var(--text-dark);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 700;
-    }
-
-    .book-description {
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      margin-top: 4px;
-      line-height: 1.6;
-    }
-
-    .book-actions {
-      margin-top: 12px;
-    }
-
-    /* BOTÓN NEUMÓRFICO */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 32px;
-      border-radius: var(--radius-pill);
-      background: var(--bg);
-      box-shadow: var(--nm-pill);
-      color: var(--text-dark);
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: hsl(var(--hsl));
+      color: #000;
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      transition: all 0.2s ease;
-      cursor: pointer;
       border: none;
-    }
-
-    .btn:hover {
-      box-shadow: var(--nm-pill-hover);
-      color: var(--brand-accent);
-      transform: translateY(1px);
-    }
-
-    .btn:active {
-      box-shadow: var(--nm-pressed);
-    }
-
-    /* BLOQUES INFORMATIVOS NEUMÓRFICOS */
-    .info-box {
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
-      padding: 36px;
-      border-radius: var(--radius-large);
-      color: var(--text-dark);
+      cursor: pointer;
     }
 
     footer {
@@ -338,26 +236,6 @@
       text-align: center;
       font-size: 0.85rem;
       color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* ADAPTABILIDAD MÓVIL */
-    @media (max-width: 768px) {
-      .about-section {
-        grid-template-columns: 1fr;
-        gap: 30px;
-      }
-
-      .book-card {
-        grid-template-columns: 1fr;
-        padding: 24px;
-        gap: 24px;
-      }
-
-      .cover-wrapper {
-        max-width: 180px;
-        margin: 0 auto;
-      }
     }
   </style>
 </head>
@@ -369,75 +247,50 @@
         <div class="logo-container">
           <img src="Logo_200_01.png" alt="Logo Cartapecora" onerror="this.parentElement.innerHTML='📜';">
         </div>
-
         <div>
           <h1 class="brand-title">CARTAPECORA</h1>
           <p class="brand-subtitle">Archivo Literario Digital & Depósito Cultural Regional</p>
         </div>
-
-        <nav class="main-nav">
-          <ul class="nav-list">
-            <li><a href="#catalogo" class="nav-link">Obras</a></li>
-            <li><a href="#autores" class="nav-link">Autores</a></li>
-            <li><a href="#talleres" class="nav-link">Talleres</a></li>
-            <li><a href="#contacto" class="nav-link">Contacto</a></li>
-          </ul>
-        </nav>
       </div>
     </header>
 
-    <section class="about-section">
-      <article class="about-card">
-        <h2>Visión</h2>
-        <p>
-          Nuestra visión es consolidarnos como el espacio digital de referencia regional para la preservación y lectura de autores locales. Aspiramos a ser el repositorio cultural más innovador, promoviendo el conocimiento y la creación sin fronteras físicas. Nos proyectamos como una plataforma dinámica e incluyente que no solo rescata la memoria colectiva e impulsa la circulación de obras en PDF, sino que demuestra que, desde un entorno virtual, es factible mejorar nuestras destrezas de escritura de manera ágil e interactiva, transformando la forma en que el mundo descubre y valora el talento de nuestra tierra.
-        </p>
-      </article>
-
-      <article class="about-card">
-        <h2>Misión</h2>
-        <p>
-          Nuestra misión es preservar, rescatar y difundir la riqueza literaria e intelectual de los autores de nuestra región a través de un archivo digital accesible en formato PDF. Nos dedicamos a democratizar la lectura y ser un canal abierto donde, por medio de talleres virtuales, es factible potenciar nuestras capacidades de expresión y escritura. Buscamos salvaguardar el patrimonio escrito, promover la identidad cultural de nuestra comunidad y conectar activamente la voz de los creadores con lectores de todas las generaciones.
-        </p>
-      </article>
-    </section>
-
-    <!-- SECCIONES EN BLOQUES VERTICALES PARA PERMITIR EL SCROLL DE LA NAVEGACIÓN -->
-    <div class="sections-vertical">
+    <!-- SECCIÓN DE TARJETAS TIPO SLIDER -->
+    <main class="main">
+      <h2 class="main__heading">Explora el Archivo</h2>
       
-      <!-- Sección 1: Obras -->
-      <section id="catalogo">
-        <h2 class="section-title">Obras Disponibles</h2>
-        <div id="catalog" class="grid-books">
-          <!-- Carga dinámica desde Supabase -->
-        </div>
-      </section>
+      <div class="cards">
+        <div class="cards__inner">
+          
+          <!-- Tarjeta 1: Obras -->
+          <article class="card">
+            <h3 class="card__title">Obras Disponibles</h3>
+            <p class="card__description">Catálogo principal de libros y publicaciones digitales en formato PDF.</p>
+            <div id="catalog" class="grid-books">
+              <!-- Carga de Supabase -->
+            </div>
+          </article>
 
-      <!-- Sección 2: Autores -->
-      <section id="autores">
-        <h2 class="section-title">Autores Destacados</h2>
-        <div class="info-box">
-          <p>Espacio dedicado al catálogo biográfico y la nómina de creadores locales representados en nuestro archivo.</p>
-        </div>
-      </section>
+          <!-- Tarjeta 2: Autores -->
+          <article class="card">
+            <h3 class="card__title">Autores Destacados</h3>
+            <p class="card__description">Espacio dedicado al catálogo biográfico y la nómina de creadores locales representados en nuestro archivo.</p>
+          </article>
 
-      <!-- Sección 3: Talleres -->
-      <section id="talleres">
-        <h2 class="section-title">Talleres Virtuales</h2>
-        <div class="info-box">
-          <p>Espacio interactivo enfocado en potenciar las capacidades de expresión, lectura crítica y creación literaria de la comunidad.</p>
-        </div>
-      </section>
+          <!-- Tarjeta 3: Talleres -->
+          <article class="card">
+            <h3 class="card__title">Talleres Virtuales</h3>
+            <p class="card__description">Espacio interactivo enfocado en potenciar las capacidades de expresión, lectura crítica y creación literaria.</p>
+          </article>
 
-      <!-- Sección 4: Contacto -->
-      <section id="contacto">
-        <h2 class="section-title">Contacto</h2>
-        <div class="info-box">
-          <p>¿Eres un autor local o deseas enviar una obra para su archivo y difusión? Escríbenos para ponernos en comunicación.</p>
-        </div>
-      </section>
+          <!-- Tarjeta 4: Contacto -->
+          <article class="card">
+            <h3 class="card__title">Contacto</h3>
+            <p class="card__description">¿Eres un autor local o deseas enviar una obra para su archivo y difusión? Escríbenos para ponernos en comunicación.</p>
+          </article>
 
-    </div>
+        </div>
+      </div>
+    </main>
 
     <footer>
       <p>© <span id="year"></span> CARTAPECORA. Todos los derechos reservados.</p>
@@ -447,11 +300,10 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // CONFIGURACIÓN DE SUPABASE
+    // SUPABASE CONFIG
     const SUPABASE_URL = 'https://xuiomosfnutsxrqjvszy.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_GOx8Ejp0p50ZZJGL0CqO9w_nllW8cbk';
     
-    // Inicialización
     let supabaseClient = null;
     if (typeof supabase !== 'undefined') {
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -459,16 +311,7 @@
 
     async function loadBooks() {
       const catalogContainer = document.getElementById('catalog');
-      
-      if (!supabaseClient) {
-        catalogContainer.innerHTML = `
-          <div class="info-box">
-            <p style="color: var(--text-muted);">
-              Modo de demostración: Configura tus credenciales de <strong>Supabase</strong> para cargar los libros dinámicamente.
-            </p>
-          </div>`;
-        return;
-      }
+      if (!supabaseClient) return;
 
       try {
         const { data: libros, error } = await supabaseClient
@@ -477,47 +320,27 @@
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-
         if (!libros || libros.length === 0) {
-          catalogContainer.innerHTML = '<div class="info-box"><p style="color: var(--text-muted);">No hay publicaciones disponibles en este momento.</p></div>';
+          catalogContainer.innerHTML = '<p style="color: var(--text-muted);">No hay publicaciones disponibles.</p>';
           return;
         }
 
         catalogContainer.innerHTML = '';
-
         libros.forEach(libro => {
-          const bookArticle = document.createElement('article');
+          const bookArticle = document.createElement('div');
           bookArticle.className = 'book-card';
-
           bookArticle.innerHTML = `
             <div class="cover-wrapper">
-              <img src="${libro.url_portada || 'https://via.placeholder.com/200x300?text=Sin+Portada'}" alt="Portada de ${libro.titulo}" loading="lazy">
+              <img src="${libro.url_portada || 'https://via.placeholder.com/200x300?text=Sin+Portada'}" alt="Portada de ${libro.titulo}">
             </div>
-            <div class="book-info">
-              <h3 class="book-title">${libro.titulo}</h3>
-              <p class="book-author">${libro.autor} ${libro.ano ? '• ' + libro.ano : ''}</p>
-              
-              <div class="book-tags">
-                ${libro.genero ? `<span class="tag">${libro.genero}</span>` : ''}
-                <span class="tag">PDF</span>
-              </div>
-
-              <p class="book-description">${libro.resena || 'Sin descripción disponible.'}</p>
-
-              <div class="book-actions">
-                <a href="${libro.url_pdf}" class="btn" target="_blank" rel="noopener noreferrer" download>
-                  Descargar PDF
-                </a>
-              </div>
-            </div>
+            <h4>${libro.titulo}</h4>
+            <p style="font-size: 0.8rem; color: #94a3b8;">${libro.autor}</p>
+            <a href="${libro.url_pdf}" class="btn" target="_blank" rel="noopener noreferrer" download>Descargar PDF</a>
           `;
-
           catalogContainer.appendChild(bookArticle);
         });
-
       } catch (err) {
-        console.error('Error al cargar libros desde Supabase:', err.message);
-        catalogContainer.innerHTML = '<div class="info-box"><p style="color: var(--text-muted);">Ocurrió un error al conectar con el archivo digital.</p></div>';
+        console.error('Error Supabase:', err.message);
       }
     }
 
