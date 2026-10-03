@@ -9,10 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&display=swap" rel="stylesheet">
 
-  <!-- SDK de Supabase -->
+  <!-- SDK de Supabase desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    /* Definición opcional por si tienes el archivo tipográfico NT Wagner localmente */
     @font-face {
       font-family: 'NT Wagner';
       src: local('NT Wagner'), local('NTWagner-Regular');
@@ -191,7 +192,7 @@
       line-height: 1.7;
     }
 
-    /* SECCIÓN OBRAS DISPONIBLES */
+    /* OBRAS DISPONIBLES */
     .obras-section {
       width: 100%;
       margin: 0 auto 70px auto;
@@ -243,26 +244,28 @@
       gap: 32px;
     }
 
-    .cover-wrapper {
-      width: 220px;
-      min-width: 220px;
-      aspect-ratio: 2 / 3;
-      border-radius: var(--radius-medium);
-      background: var(--bg);
-      box-shadow: var(--nm-pressed);
-      overflow: hidden;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    ..cover-wrapper {
+  width: 220px;
+  min-width: 220px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-medium);
+  background: var(--bg);
+  box-shadow: var(--nm-pressed);
+  overflow: hidden;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .cover-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 10px;
-    }
+.cover-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  background-color: var(--bg); /* Cubre cualquier contenido detrás de la imagen */
+  display: block;
+}
 
     .book-info {
       display: flex;
@@ -551,6 +554,7 @@
         return;
       }
 
+      // Respaldo visual nativo en SVG (sin dependencias de CDNs de terceros)
       const fallbackSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="330" viewBox="0 0 220 330"><rect width="100%" height="100%" fill="%23b6afbf"/><text x="50%" y="50%" font-family="sans-serif" font-size="16" fill="%23222222" text-anchor="middle" dominant-baseline="middle">Sin Portada</text></svg>`;
 
       libros.forEach((libro, idx) => {
@@ -572,7 +576,7 @@
                 url_portada = `${SUPABASE_URL}/storage/v1/object/public/PORTADAS/${encodeURIComponent(cleanFile)}`;
               }
             } catch (e) {
-              console.warn('Error al procesar la preview:', e);
+              console.warn('Error decodificando parámetro preview:', e);
             }
           } 
           else if (rawPortada.startsWith('http://') || rawPortada.startsWith('https://')) {
@@ -595,8 +599,8 @@
 
         slide.innerHTML = `
           <div class="cover-wrapper">
-            <img src="${url_portada}" alt="Portada de ${titulo}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSVG}';">
-          </div>
+        <img src="${url_portada}" alt="Portada de ${titulo}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSVG}';">
+      </div>
           <div class="book-info">
             <h3 class="book-title">${titulo}</h3>
             <p class="book-author">${autor} ${ano ? '• ' + ano : ''}</p>
