@@ -554,23 +554,35 @@
       contenedor.innerHTML = textoCompleto;
     }
 
-    async function downloadPDF(url, filename) {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error en la descarga');
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename || 'obra-cartapecora.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(blobUrl);
-      } catch (err) {
-        console.warn('Fallback a apertura directa:', err);
-        window.open(url, '_blank');
+   function downloadPDF(url, filename) {
+      if (!url || url === '#') return;
+
+      // Si es un enlace DOI o una URL externa que no sea de Supabase, abrir directamente
+      if (url.includes('doi.org') || (!url.includes('supabase.co') && url.startsWith('http'))) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
       }
+
+      // Si es un archivo PDF de Supabase, realizar la descarga
+      fetch(url)
+        .then(response => {
+          if (!response.ok) throw new Error('Error en la descarga');
+          return response.blob();
+        })
+        .then(blob => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename || 'obra-cartapecora.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(err => {
+          console.warn('Redireccionando a apertura directa:', err);
+          window.open(url, '_blank');
+        });
     }
 
     function renderSlider(libros) {
@@ -590,8 +602,7 @@
 
       const fallbackSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="330" viewBox="0 0 220 330"><rect width="100%" height="100%" fill="%23b6afbf"/><text x="50%" y="50%" font-family="sans-serif" font-size="16" fill="%23222222" text-anchor="middle" dominant-baseline="middle">Sin Portada</text></svg>`;
 
-      libros.forEach((libro, idx) => {
-        const titulo = libro.titulo || libro.title || 'Sin Título';
+    const titulo = libro.titulo || libro.title || 'Sin Título';
         const autor = libro.autor || libro.author || 'Autor Desconocido';
         const ano = libro.ano || libro.year || '';
         const genero = libro.genero || libro.genre || '';
@@ -629,6 +640,11 @@
 
         const url_pdf = (libro.url_pdf || libro.pdf_url || libro.archivo || '#').trim();
 
+        // Detección de DOI / Repositorio
+        const esDOI = url_pdf.includes('doi.org');
+        const textoBoton = esDOI ? 'Ver en Repositorio DOI' : 'Descargar PDF';
+        const etiquetaTipo = esDOI ? 'DOI / REPOSITORIO' : 'PDF';
+
         const slide = document.createElement('div');
         slide.className = 'slide-item';
 
@@ -642,7 +658,7 @@
             
             <div class="book-tags">
               ${genero ? `<span class="tag">${genero}</span>` : ''}
-              <span class="tag">PDF</span>
+              <span class="tag">${etiquetaTipo}</span>
             </div>
 
             <p class="book-description">${resena}</p>
@@ -650,7 +666,7 @@
             <div class="book-actions">
               ${url_pdf !== '#' ? `
                 <button class="btn" onclick="downloadPDF('${url_pdf}', '${titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf')">
-                  Descargar PDF
+                  ${textoBoton}
                 </button>
               ` : ''}
             </div>
@@ -662,7 +678,6 @@
         dot.className = `dot ${idx === 0 ? 'active' : ''}`;
         dot.addEventListener('click', () => goToSlide(idx));
         dotsContainer.appendChild(dot);
-      });
 
       if (totalSlides > 1) {
         controls.style.display = 'flex';
