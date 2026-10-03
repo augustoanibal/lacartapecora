@@ -75,27 +75,27 @@
     }
 
     .logo-container {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background: var(--bg);
-      box-shadow: var(--nm-flat);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+  width: 110px;
+  height: 110px;
+  border-radius: 0;           /* Elimina la forma circular */
+  background: transparent;     /* Remueve el fondo gris */
+  box-shadow: none;           /* Elimina la sombra y efecto de relieve */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;                  /* Quita el margen interno para que aproveche el espacio */
+  transition: transform 0.3s ease;
+}
 
-    .logo-container:hover {
-      transform: scale(1.03);
-      box-shadow: var(--nm-flat-hover);
-    }
+.logo-container:hover {
+  transform: scale(1.03);
+  box-shadow: none;           /* Mantiene la sombra desactivada al pasar el cursor */
+}
 
-    .logo-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+.logo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
     }
 
     .brand-title {
