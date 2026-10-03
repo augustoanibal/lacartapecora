@@ -247,7 +247,8 @@
     ..cover-wrapper {
   width: 220px;
   min-width: 220px;
-  aspect-ratio: 2 / 3;
+  max-width: 220px; /* Fuerza el ancho máximo */
+  height: 330px;    /* Establece alto fijo para proporción 2:3 */
   border-radius: var(--radius-medium);
   background: var(--bg);
   box-shadow: var(--nm-pressed);
@@ -256,14 +257,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .cover-wrapper img {
-  width: 100%;
+ width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Cambia a contain para ajustar la portada completa sin recortes */
   border-radius: 10px;
-  background-color: var(--bg); /* Cubre cualquier contenido detrás de la imagen */
   display: block;
 }
 
@@ -423,8 +424,12 @@
       }
 
       .slide-item {
-        flex-direction: column;
-        text-align: center;
+        min-width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start; /* Alinea los elementos arriba */
+        gap: 32px;
       }
 
       .book-info {
