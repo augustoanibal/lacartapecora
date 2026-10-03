@@ -240,33 +240,35 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: flex-start;
       gap: 32px;
     }
 
-    ..cover-wrapper {
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px; /* Fuerza el ancho máximo */
-  height: 330px;    /* Establece alto fijo para proporción 2:3 */
-  border-radius: var(--radius-medium);
-  background: var(--bg);
-  box-shadow: var(--nm-pressed);
-  overflow: hidden;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+    .cover-wrapper {
+      width: 220px;
+      min-width: 220px;
+      max-width: 220px;
+      height: 330px;
+      border-radius: var(--radius-medium);
+      background: var(--bg);
+      box-shadow: var(--nm-pressed);
+      overflow: hidden;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
 
-.cover-wrapper img {
- width: 100%;
-  height: 100%;
-  object-fit: contain; /* Cambia a contain para ajustar la portada completa sin recortes */
-  border-radius: 10px;
-  display: block;
-}
+    .cover-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+      background-color: var(--bg);
+      display: block;
+    }
 
     .book-info {
       display: flex;
@@ -275,6 +277,7 @@
       text-align: left;
       align-items: flex-start;
       flex: 1;
+      width: 100%;
     }
 
     .book-title {
@@ -314,6 +317,19 @@
       color: var(--text-dark);
       line-height: 1.6;
       text-align: justify;
+    }
+
+    .read-more {
+      color: var(--brand-accent);
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 4px;
+      text-decoration: underline;
+      display: inline-block;
+    }
+
+    .read-more:hover {
+      opacity: 0.8;
     }
 
     .book-actions {
@@ -424,12 +440,9 @@
       }
 
       .slide-item {
-        min-width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start; /* Alinea los elementos arriba */
-        gap: 32px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
 
       .book-info {
@@ -525,6 +538,22 @@
     let currentIndex = 0;
     let totalSlides = 0;
 
+    function recortarTexto(texto, limitePalabras = 60) {
+      if (!texto) return '';
+      const palabras = texto.trim().split(/\s+/);
+      if (palabras.length <= limitePalabras) {
+        return texto;
+      }
+      const textoCortado = palabras.slice(0, limitePalabras).join(' ');
+      return `${textoCortado}... <span class="read-more" onclick="toggleResena(this)" data-full="${encodeURIComponent(texto)}">(Seguir leyendo...)</span>`;
+    }
+
+    function toggleResena(elemento) {
+      const textoCompleto = decodeURIComponent(elemento.getAttribute('data-full'));
+      const contenedor = elemento.parentElement;
+      contenedor.innerHTML = textoCompleto;
+    }
+
     async function downloadPDF(url, filename) {
       try {
         const response = await fetch(url);
@@ -559,7 +588,6 @@
         return;
       }
 
-      // Respaldo visual nativo en SVG (sin dependencias de CDNs de terceros)
       const fallbackSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="330" viewBox="0 0 220 330"><rect width="100%" height="100%" fill="%23b6afbf"/><text x="50%" y="50%" font-family="sans-serif" font-size="16" fill="%23222222" text-anchor="middle" dominant-baseline="middle">Sin Portada</text></svg>`;
 
       libros.forEach((libro, idx) => {
@@ -567,8 +595,10 @@
         const autor = libro.autor || libro.author || 'Autor Desconocido';
         const ano = libro.ano || libro.year || '';
         const genero = libro.genero || libro.genre || '';
-        const resena = libro.resena || libro.description || libro.sinopsis || 'Sin reseña disponible.';
         
+        const resenaOriginal = libro.resena || libro.description || libro.sinopsis || 'Sin reseña disponible.';
+        const resena = recortarTexto(resenaOriginal, 60);
+
         let rawPortada = (libro.url_portada || libro.cover_url || libro.imagen || libro.portada || '').trim();
         let url_portada = '';
 
@@ -604,8 +634,8 @@
 
         slide.innerHTML = `
           <div class="cover-wrapper">
-        <img src="${url_portada}" alt="Portada de ${titulo}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSVG}';">
-      </div>
+            <img src="${url_portada}" alt="Portada de ${titulo}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSVG}';">
+          </div>
           <div class="book-info">
             <h3 class="book-title">${titulo}</h3>
             <p class="book-author">${autor} ${ano ? '• ' + ano : ''}</p>
