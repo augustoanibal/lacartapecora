@@ -237,7 +237,7 @@
       line-height: 1.8;
     }
 
-    /* SECCIÓN OBRAS DE INICIO Y VISTA OBRAS COMPLETA */
+    /* SECCIÓN OBRAS Y AUTORES */
     .obras-section {
       width: 100%;
       margin: 0 auto 70px auto;
@@ -290,7 +290,7 @@
       gap: 24px;
     }
 
-    /* GRID COMPLETO DE OBRAS PARA LA PANTALLA INDEPENDIENTE */
+    /* GRID COMPLETO DE OBRAS Y AUTORES */
     .obras-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -336,6 +336,35 @@
       border-radius: 0;
       outline: none;
       display: block;
+    }
+
+    /* ESTILOS ESPECÍFICOS PARA LA FOTO DEL AUTOR */
+    .author-avatar-wrapper {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      box-shadow: var(--nm-pill);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .author-avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .author-bio {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      line-height: 1.6;
+      text-align: justify;
+      margin-top: 6px;
     }
 
     .book-info {
@@ -648,7 +677,7 @@
         <nav class="main-nav">
           <ul class="nav-list">
             <li><button class="nav-link" id="btn-obras" onclick="irASeccion('obras')">Obras</button></li>
-            <li><button class="nav-link" id="btn-autores" onclick="irAInicio()">Autores</button></li>
+            <li><button class="nav-link" id="btn-autores" onclick="irASeccion('autores')">Autores</button></li>
             <li><button class="nav-link" id="btn-talleres" onclick="irASeccion('talleres')">Talleres</button></li>
             <li><button class="nav-link" id="btn-contacto" onclick="abrirContacto()">Contacto</button></li>
           </ul>
@@ -693,12 +722,22 @@
       </section>
     </main>
 
-    <!-- PANTALLA COMPLETA SECCIÓN OBRAS (NO FLOTANTE) -->
+    <!-- PANTALLA COMPLETA SECCIÓN OBRAS -->
     <main id="view-obras" class="page-view">
       <section class="obras-section">
         <h2 class="section-title-center">Catálogo General de Obras</h2>
         <div id="obras-grid-container" class="obras-grid">
           <!-- Carga dinámica de cuadrícula -->
+        </div>
+      </section>
+    </main>
+
+    <!-- PANTALLA COMPLETA SECCIÓN AUTORES -->
+    <main id="view-autores" class="page-view">
+      <section class="obras-section">
+        <h2 class="section-title-center">Autores Registrados</h2>
+        <div id="autores-grid-container" class="obras-grid">
+          <!-- Carga dinámica de autores desde Supabase -->
         </div>
       </section>
     </main>
@@ -710,7 +749,7 @@
         <article class="talleres-card">
           <h2>Reseña</h2>
           <p>
-            El Taller de Textos tiene por finalidad ayudar a las personas a consolidar sus impulsos creativos en un relato. Este proceso es paulatino y va acorde a la consolidación del progreso del participante. Escribir no requiere tener conocimientos previos de literatura o escritura, solo es necesario querer expresar. Partimos de la idea de que todos tenemos un estilo oculto y por medio de los ejercicios iremos depurando lo que está demás, dejando solo la voz del autor. Hemos venido desarrollando el taller para jóvenes y adultos interesados, es un trabajo complejo porque la mayor complicación es la predisposición a escribir, las personas que ingresan vienen con la idea de que solo con teoría lograrán algo y no es así, se enfrentan a una autocensura innecesaria. En este período hemos conseguido que la mayoría de los participantes logre escribir un relato de manera coherente, puntual y sobre todo desde su estilo, ya solo dejamos en ellos la responsabilidad de darle caracter a su estilo por medio de la lectura constante y el oficio. Nuestros talleres son virtuales para adultos y semipresenciales para jóvenes y niños.
+            El Taller de Textos tiene por finalidad ayudar a las personas a consolidar sus impulsos creativos en un relato. Este proceso es paulatino y va acorde a la consolidación del progreso del participante. Escribir no requiere tener conocimientos previos de literatura o escritura, solo es necesario querer expresar. Partimos de la idea de que todos tenemos un estilo oculto y por medio de los ejercicios iremos depurando lo que está demás, dejando solo la voz del autor. Hemos venido desarrollando el taller para jóvenes y adultos interesados, es un trabajo complejo porque la mayor complicación es la predisposición a escribir, las personas que ingresan vienen con la idea de que solo con teoría lograrán algo y no es así, se enfrentan a una autocensura innecesaria. En este período hemos conseguido que la mayoría de los participantes logre escribir un relato de manera coherente, puntual y sobre todo desde su estilo, ya solo dejamos en ellos la responsabilidad de darle caracter a su estilo por medio de la lectura constante y el oficio. Nuestras talleres son virtuales para adultos y semipresenciales para jóvenes y niños.
           </p>
         </article>
       </section>
@@ -760,6 +799,7 @@
     let currentIndex = 0;
     let totalSlides = 0;
     let librosData = [];
+    let autoresData = [];
 
     /* MANEJO DE NAVEGACIÓN Y PANTALLAS */
     function irAInicio() {
@@ -777,6 +817,10 @@
         document.getElementById('view-obras').classList.add('active-view');
         document.getElementById('btn-obras').classList.add('active');
         renderGridObras(librosData);
+      } else if (seccion === 'autores') {
+        document.getElementById('view-autores').classList.add('active-view');
+        document.getElementById('btn-autores').classList.add('active');
+        renderGridAutores(autoresData);
       } else if (seccion === 'talleres') {
         document.getElementById('view-talleres').classList.add('active-view');
         document.getElementById('btn-talleres').classList.add('active');
@@ -870,6 +914,21 @@
       return fallbackSVG;
     }
 
+    function obtenerUrlFotoAutor(autor) {
+      const fallbackSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="100%" height="100%" fill="%23b6afbf"/></svg>`;
+      let rawFoto = (autor.foto_url || autor.imagen || autor.foto || '').trim();
+
+      if (rawFoto) {
+        if (rawFoto.startsWith('http://') || rawFoto.startsWith('https://')) {
+          return rawFoto;
+        } else {
+          const cleanFile = decodeURIComponent(rawFoto).replace(/^\//, '');
+          return `${SUPABASE_URL}/storage/v1/object/public/AUTORES/${encodeURIComponent(cleanFile)}`;
+        }
+      }
+      return fallbackSVG;
+    }
+
     /* RENDERIZADO SLIDER (INICIO) */
     function renderSlider(libros) {
       const track = document.getElementById('catalog-track');
@@ -943,7 +1002,7 @@
       updateSlider();
     }
 
-    /* RENDERIZADO DE LA PANTALLA INDEPENDIENTE DE OBRAS */
+    /* RENDERIZADO PANTALLA OBRAS */
     function renderGridObras(libros) {
       const gridContainer = document.getElementById('obras-grid-container');
       gridContainer.innerHTML = '';
@@ -995,6 +1054,40 @@
                 </button>
               ` : ''}
             </div>
+          </div>
+        `;
+        gridContainer.appendChild(card);
+      });
+    }
+
+    /* RENDERIZADO PANTALLA AUTORES */
+    function renderGridAutores(autores) {
+      const gridContainer = document.getElementById('autores-grid-container');
+      gridContainer.innerHTML = '';
+
+      if (!autores || autores.length === 0) {
+        gridContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; grid-column: 1/-1;">No hay autores registrados.</p>';
+        return;
+      }
+
+      const fallbackSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect width="100%" height="100%" fill="%23b6afbf"/></svg>`;
+
+      autores.forEach(autorItem => {
+        const nombre = autorItem.nombre || autorItem.name || 'Autor Sin Nombre';
+        const biodataOriginal = autorItem.biodata || autorItem.biografia || autorItem.bio || 'Sin biografía disponible.';
+        const biodata = recortarTexto(biodataOriginal, 40);
+        const urlFoto = obtenerUrlFotoAutor(autorItem);
+
+        const card = document.createElement('div');
+        card.className = 'obra-card-item';
+
+        card.innerHTML = `
+          <div class="author-avatar-wrapper">
+            <img src="${urlFoto}" alt="Fotografía de ${nombre}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSVG}';">
+          </div>
+          <div class="book-info">
+            <h3 class="book-title" style="font-size: 1.3rem;">${nombre}</h3>
+            <p class="author-bio">${biodata}</p>
           </div>
         `;
         gridContainer.appendChild(card);
@@ -1054,13 +1147,33 @@
         renderSlider(librosData);
 
       } catch (err) {
-        console.error('Error al conectar con Supabase:', err.message);
+        console.error('Error al conectar con la tabla libros:', err.message);
         const track = document.getElementById('catalog-track');
         track.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; width: 100%;">No se pudo conectar con el banco de datos. Verifica las políticas RLS (Row Level Security) en Supabase.</p>';
       }
     }
 
+    async function loadAuthors() {
+      if (!supabaseClient) return;
+
+      try {
+        let { data: autores, error } = await supabaseClient
+          .from('autores')
+          .select('*');
+
+        if (!error) {
+          autoresData = autores || [];
+        } else {
+          console.error('Error cargando autores:', error.message);
+        }
+      } catch (err) {
+        console.error('Error al conectar con la tabla autores:', err.message);
+      }
+    }
+
+    // Inicialización de datos
     loadBooks();
+    loadAuthors();
   </script>
 </body>
 </html>
